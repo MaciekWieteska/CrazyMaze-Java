@@ -1,0 +1,135 @@
+package labirynt;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+public class Ramka extends JFrame implements ActionListener {
+    JButton b1, b2, b3, b4, b5, b6, b7, b8,b9;
+    JLabel t1;
+    JLabel background;
+
+    public Ramka() {
+        setSize(800, 800);
+        setTitle("CRAZY MAZE");
+
+        background = new JLabel(new ImageIcon("C:\\Users\\czarn\\Desktop\\programowanie\\tlojava.jpg"));
+        background.setBounds(0, 0, 800, 800);
+        background.setLayout(null);
+
+        add(background);
+        b1 = new JButton("Lab. tekstowy");
+        b1.setIcon(null);
+        b1.setToolTipText("Wczytanie lab. tekstowego");
+        b1.setBackground(Color.GREEN);
+        b1.setBounds(20, 20, 125, 40);
+        background.add(b1);
+        b1.addActionListener(this);
+
+        b2 = new JButton("Lab. binarny");
+        b2.setToolTipText("Wczytanie lab. binarnego");
+        b2.setBackground(Color.GREEN);
+        b2.setBounds(20, 80, 125, 40);
+        background.add(b2);
+        b2.addActionListener(this);
+
+        b3 = new JButton("EXIT");
+        b3.setToolTipText("Konczy dzialanie programu");
+        b3.setBackground(Color.RED);
+        b3.setBounds(700, 20, 80, 20);
+        background.add(b3);
+        b3.addActionListener(this);
+
+        t1 = new JLabel("Obecny komunikat:");
+        t1.setBounds(20, 100, 250, 100);
+        t1.setForeground(Color.YELLOW);
+        t1.setFont(new Font("SansSerif", Font.BOLD, 14));
+        background.add(t1);
+
+        b4 = new JButton("Wyswietl lab.");
+        b4.setToolTipText("Wyswietla wczytany labirynt");
+        b4.setBackground(Color.GREEN);
+        b4.setBounds(150, 20, 125, 40);
+        background.add(b4);
+        b4.addActionListener(this);
+
+        b5 = new JButton("Najkr. sciezka");
+        b5.setToolTipText("Wyswietla najkrotsza sciezke w labiryncie");
+        b5.setBackground(Color.GREEN);
+        b5.setBounds(150, 80, 125, 40);
+        background.add(b5);
+        b5.addActionListener(this);
+
+        b6 = new JButton("Ustaw pocz.");
+        b6.setToolTipText("Umozliwia ustawienie poczatku labiryntu");
+        b6.setBackground(Color.GREEN);
+        b6.setBounds(280, 20, 125, 40);
+        background.add(b6);
+        b6.addActionListener(this);
+
+        b7 = new JButton("Ustaw koniec");
+        b7.setToolTipText("Umozliwia ustawienie konca labiryntu");
+        b7.setBackground(Color.GREEN);
+        b7.setBounds(280, 80, 125, 40);
+        background.add(b7);
+        b7.addActionListener(this);
+
+        b8 = new JButton("Restart lab.");
+        b8.setToolTipText("Resetuje labirynt");
+        b8.setBackground(Color.GREEN);
+        b8.setBounds(410, 20, 125, 40);
+        background.add(b8);
+        b8.addActionListener(this);
+
+        b9 = new JButton("CLEAR");
+        b9.setToolTipText("Czysci obecny komunikat");
+        b9.setBackground(Color.GREEN);
+        b9.setBounds(410, 80, 125, 40);
+        background.add(b9);
+        b9.addActionListener(this);
+        
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        Object zrodlo = e.getSource();
+        if (zrodlo == b1) {
+            t1.setText("Wczytuje lab. tekstowy...");
+            JFileChooser fileChooser = new JFileChooser();
+            int response = fileChooser.showOpenDialog(null);
+            if(response == JFileChooser.APPROVE_OPTION) {
+            	File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+            	System.out.println(file);//pod file kryje sie sciezka do pliku ktora podamy do metody
+            	
+            }
+            
+        } else if (zrodlo == b2) {
+            t1.setText("Wczytuje lab. binarny...");
+            JFileChooser fileChooser = new JFileChooser();
+            int response = fileChooser.showOpenDialog(null);
+            if(response == JFileChooser.APPROVE_OPTION) {
+            	File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+            	System.out.println(file);//pod file kryje sie sciezka do pliku ktora podamy do metody
+            }
+        } else if (zrodlo == b3) {
+            dispose();
+        } else if (zrodlo == b4) {
+            t1.setText("Wyswietlam labirynt...");
+
+        } else if (zrodlo == b5) {
+            t1.setText("Wyszukuje najkrotsza sciezke...");
+        } else if (zrodlo == b6) {
+            t1.setText("Ustaw poczatek labiryntu!");
+        } else if (zrodlo == b7) {
+            t1.setText("Ustaw koniec labiryntu!");
+        } else if (zrodlo == b8) {
+            t1.setText("RESETUJE LABIRYNT...");
+        }
+        else if(zrodlo == b9) {
+        	t1.setText("Obecny komunikat:");
+        }
+
+    }
+
+ 
+}
