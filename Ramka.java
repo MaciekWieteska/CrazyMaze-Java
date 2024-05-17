@@ -9,6 +9,7 @@ public class Ramka extends JFrame implements ActionListener {
     JButton b1, b2, b3, b4, b5, b6, b7, b8, b9;
     JLabel t1;
     JLabel background;
+    Labirynt labirynt = new Labirynt();
 
     public Ramka() {
         setSize(800, 800);
@@ -101,11 +102,10 @@ public class Ramka extends JFrame implements ActionListener {
             if (response == JFileChooser.APPROVE_OPTION) {
                 File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
                 System.out.println(file);// pod file kryje sie sciezka do pliku ktora podamy do metody
-                Labirynt labirynt = new Labirynt();
                 labirynt.file = file;
-                labirynt.liczWielkosc(file);
-                System.out.println("Wiersze: " + labirynt.wiersze + " Kolumny:" + labirynt.kolumny);
-                labirynt.doPamieci(file);
+                labirynt.liczWielkosc();
+                labirynt.doPamieci();
+                labirynt.wyswietlLabirynt();
             }
 
         } else if (zrodlo == b2) {
