@@ -52,12 +52,9 @@ public class Labirynt extends JFrame {
         }
     }
 
-    public void wyswietlLabirynt() { // row wiersze columny
-        setTitle("Maze");
-        setSize(10 * this.kolumny, 10 * this.wiersze);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel(new GridLayout(this.wiersze, this.kolumny));
+    public void wyswietlLabirynt(JPanel panel) {
+        panel.removeAll();
+        panel.setLayout(new GridLayout(this.wiersze, this.kolumny));
 
         for (int i = 0; i < this.wiersze; i++) {
             for (int j = 0; j < this.kolumny; j++) {
@@ -83,13 +80,8 @@ public class Labirynt extends JFrame {
                 panel.add(label);
             }
         }
-
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        add(scrollPane);
-        // add(panel);
-        setVisible(true);
+        panel.setPreferredSize(new Dimension(this.kolumny * 10, this.wiersze * 10));
+        panel.revalidate();
+        panel.repaint();
     }
 }
