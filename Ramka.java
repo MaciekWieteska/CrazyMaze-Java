@@ -31,7 +31,6 @@ public class Ramka extends JFrame implements ActionListener {
         background.add(b1);
         b1.addActionListener(this);
 
-
         b3 = new JButton("EXIT");
         b3.setToolTipText("Konczy dzialanie programu");
         b3.setBackground(Color.RED);
@@ -87,7 +86,6 @@ public class Ramka extends JFrame implements ActionListener {
         background.add(b9);
         b9.addActionListener(this);
 
-
         colorPanel = new JPanel();
         scrollPane = new JScrollPane(colorPanel);
         scrollPane.setBounds((getWidth() - 700) / 2, getHeight() - 600, 650, 500);
@@ -109,14 +107,6 @@ public class Ramka extends JFrame implements ActionListener {
             }
         });
 
-        
-        ColorPanel colorPanel = new ColorPanel();
-        JScrollPane scrollPane = new JScrollPane(colorPanel);
-        scrollPane.setBounds((getWidth() - 700) / 2, getHeight() - 600, 700, 600); 
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        background.add(scrollPane);
-
         setVisible(true);
     }
 
@@ -132,20 +122,12 @@ public class Ramka extends JFrame implements ActionListener {
                 labirynt.file = file;
                 labirynt.liczWielkosc();
                 labirynt.doPamieci();
-
                 labirynt.wyswietlLabirynt(colorPanel);
             }
-
-                labirynt.wyswietlLabirynt();
-            }
-
-         
-
         } else if (zrodlo == b3) {
             dispose();
         } else if (zrodlo == b4) {
             t1.setText("Tworze obrazek...");
-
         } else if (zrodlo == b5) {
             t1.setText("Wyszukuje najkrotsza sciezke...");
         } else if (zrodlo == b6) {
