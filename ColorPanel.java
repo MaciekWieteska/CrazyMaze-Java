@@ -13,7 +13,11 @@ public class ColorPanel extends JPanel {
     private Point lastMousePosition;
 
     public ColorPanel() {
+
+        setPreferredSize(new Dimension(5000, 5000));
+
         setPreferredSize(new Dimension(5000, 5000)); 
+
         addMouseWheelListener(new ScaleHandler());
         addMouseListener(new MouseHandler());
         addMouseMotionListener(new MouseHandler());
@@ -24,13 +28,13 @@ public class ColorPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        
+
         AffineTransform transform = new AffineTransform();
         transform.scale(scale, scale);
         transform.translate(translateX / scale, translateY / scale);
         g2d.setTransform(transform);
 
-        
+
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, getWidth(), getHeight());
     }
@@ -69,5 +73,4 @@ public class ColorPanel extends JPanel {
         }
     }
 }
-
 
