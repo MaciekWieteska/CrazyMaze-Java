@@ -1,11 +1,13 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
-
+import java.io.IOException;
 public class Ramka extends JFrame implements ActionListener {
     JButton b1, b2, b3, b4, b5, b6, b7, b8, b9;
     JLabel t1;
@@ -140,6 +142,31 @@ public class Ramka extends JFrame implements ActionListener {
             t1.setText("RESETUJE LABIRYNT...");
         } else if (zrodlo == b9) {
             t1.setText("Obecny komunikat:");
+        }
+    }
+        public static final void makeScreenshot(JPanel colorPanel2) {
+        Rectangle rec = colorPanel2.getBounds();
+        BufferedImage bufferedImage = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_INT_ARGB);
+        colorPanel2.paint(bufferedImage.getGraphics());
+
+        try {
+          
+            File file = new File("C:\\MinGW\\bin\\screenshot.png");
+
+           
+            System.out.println("Próba zapisu zrzutu ekranu do: " + file.getAbsolutePath());
+
+            
+            boolean result = ImageIO.write(bufferedImage, "png", file);
+
+            if (result) {
+                System.out.println("Zrzut ekranu zapisany jako: " + file.getAbsolutePath());
+            } else {
+                System.out.println("Błąd podczas zapisywania zrzutu ekranu." + result);           }
+        
+        } catch (Exception ex) {
+            System.out.println("Nieoczekiwany błąd: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
