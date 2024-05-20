@@ -140,6 +140,7 @@ public class Ramka extends JFrame implements ActionListener {
             t1.setText("Ustaw koniec labiryntu!");
         } else if (zrodlo == b8) {
             t1.setText("RESETUJE LABIRYNT...");
+            resetLabirynt();
         } else if (zrodlo == b9) {
             t1.setText("Obecny komunikat:");
         }
@@ -168,5 +169,12 @@ public class Ramka extends JFrame implements ActionListener {
             System.out.println("Nieoczekiwany błąd: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+    private void resetLabirynt() {
+        labirynt = new Labirynt(); 
+        colorPanel.removeAll();
+        colorPanel.setBackground(Color.WHITE);
+        colorPanel.revalidate();
+        colorPanel.repaint();
     }
 }
