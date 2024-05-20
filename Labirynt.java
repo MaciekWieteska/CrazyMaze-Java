@@ -84,4 +84,11 @@ public class Labirynt extends JFrame {
         panel.revalidate();
         panel.repaint();
     }
+
+    public void DFS() {
+        char[][] zawartosc = this.zawartosc;
+        int kolumny = this.kolumny;
+        int wiersze = this.wiersze;
+
+    }
 }

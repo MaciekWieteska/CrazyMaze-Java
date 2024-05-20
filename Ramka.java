@@ -19,7 +19,9 @@ public class Ramka extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
-        JLabel background = new JLabel(new ImageIcon("C:\\Users\\czarn\\Desktop\\programowanie\\tlojava.jpg"));
+        ClassLoader classLoader = getClass().getClassLoader();
+        java.net.URL imageUrl = classLoader.getResource("tlo1.jpg");
+        JLabel background = new JLabel(new ImageIcon(imageUrl));
         background.setBounds(0, 0, 800, 800);
         add(background);
         background.setLayout(null);
