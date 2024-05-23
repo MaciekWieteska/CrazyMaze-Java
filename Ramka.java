@@ -172,18 +172,14 @@ public class Ramka extends JFrame implements ActionListener {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             try {
-                System.out.println("Próba zapisu zrzutu ekranu do: " + file.getAbsolutePath());
 
                 boolean result = ImageIO.write(bufferedImage, "png", file);
 
                 if (result) {
-                    System.out.println("Zrzut ekranu zapisany jako: " + file.getAbsolutePath());
                 } else {
-                    System.out.println("Błąd podczas zapisywania zrzutu ekranu.");
                 }
 
             } catch (Exception ex) {
-                System.out.println("Nieoczekiwany błąd: " + ex.getMessage());
                 ex.printStackTrace();
             }
         }
