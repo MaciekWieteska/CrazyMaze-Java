@@ -1,12 +1,15 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Ramka extends JFrame implements ActionListener {
+    boolean wczytLab = false;
     JButton b1, b2, b3, b4, b5, b6, b7, b8, b9;
     JLabel t1;
     Labirynt labirynt = new Labirynt();
@@ -19,7 +22,9 @@ public class Ramka extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
-        JLabel background = new JLabel(new ImageIcon("C:\\Users\\czarn\\Desktop\\programowanie\\tlojava.jpg"));
+        ClassLoader classLoader = getClass().getClassLoader();
+        java.net.URL imageUrl = classLoader.getResource("tlo1.jpg");
+        JLabel background = new JLabel(new ImageIcon(imageUrl));
         background.setBounds(0, 0, 800, 800);
         add(background);
         background.setLayout(null);
@@ -30,7 +35,6 @@ public class Ramka extends JFrame implements ActionListener {
         b1.setBounds(20, 20, 125, 40);
         background.add(b1);
         b1.addActionListener(this);
-
 
         b3 = new JButton("EXIT");
         b3.setToolTipText("Konczy dzialanie programu");
@@ -45,7 +49,7 @@ public class Ramka extends JFrame implements ActionListener {
         t1.setFont(new Font("SansSerif", Font.BOLD, 14));
         background.add(t1);
 
-        b4 = new JButton("Stworz JPG");
+        b4 = new JButton("Stworz PNG");
         b4.setToolTipText("Tworzy labirynt w postaci graficznej");
         b4.setBackground(Color.GREEN);
         b4.setBounds(150, 20, 125, 40);
@@ -87,7 +91,6 @@ public class Ramka extends JFrame implements ActionListener {
         background.add(b9);
         b9.addActionListener(this);
 
-
         colorPanel = new JPanel();
         scrollPane = new JScrollPane(colorPanel);
         scrollPane.setBounds((getWidth() - 700) / 2, getHeight() - 600, 650, 500);
@@ -109,14 +112,6 @@ public class Ramka extends JFrame implements ActionListener {
             }
         });
 
-        
-        ColorPanel colorPanel = new ColorPanel();
-        JScrollPane scrollPane = new JScrollPane(colorPanel);
-        scrollPane.setBounds((getWidth() - 700) / 2, getHeight() - 600, 700, 600); 
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        background.add(scrollPane);
-
         setVisible(true);
     }
 
@@ -128,34 +123,84 @@ public class Ramka extends JFrame implements ActionListener {
             int response = fileChooser.showOpenDialog(null);
             if (response == JFileChooser.APPROVE_OPTION) {
                 File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                if (this.wczytLab == true) {
+                    resetLabirynt();
+                }
                 System.out.println(file);// pod file kryje sie sciezka do pliku ktora podamy do metody
                 labirynt.file = file;
                 labirynt.liczWielkosc();
                 labirynt.doPamieci();
-
-                labirynt.wyswietlLabirynt(colorPanel);
+                labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                this.wczytLab = true;
             }
-
-                labirynt.wyswietlLabirynt();
-            }
-
-         
-
         } else if (zrodlo == b3) {
             dispose();
         } else if (zrodlo == b4) {
             t1.setText("Tworze obrazek...");
-
+            makeScreenshot(colorPanel);
         } else if (zrodlo == b5) {
             t1.setText("Wyszukuje najkrotsza sciezke...");
+            if (this.wczytLab == true) {
+                labirynt.BFS();
+                nie_wyswietlaj();
+                labirynt.wyswietlLabirynt(colorPanel, labirynt.labiryntDoRysowania);
+            }
         } else if (zrodlo == b6) {
             t1.setText("Ustaw poczatek labiryntu!");
         } else if (zrodlo == b7) {
             t1.setText("Ustaw koniec labiryntu!");
         } else if (zrodlo == b8) {
             t1.setText("RESETUJE LABIRYNT...");
+            resetLabirynt();
+            this.wczytLab = false;
         } else if (zrodlo == b9) {
             t1.setText("Obecny komunikat:");
         }
+    }
+
+    public static final void makeScreenshot(JPanel colorPanel2) {
+        Rectangle rec = colorPanel2.getBounds();
+        BufferedImage bufferedImage = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_INT_ARGB);
+        colorPanel2.paint(bufferedImage.getGraphics());
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Wybierz lokalizację do zapisu zrzutu ekranu");
+        fileChooser.setSelectedFile(new File("screenshot.png")); // Domyślna nazwa pliku
+
+        int userSelection = fileChooser.showSaveDialog(null);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
+                System.out.println("Próba zapisu zrzutu ekranu do: " + file.getAbsolutePath());
+
+                boolean result = ImageIO.write(bufferedImage, "png", file);
+
+                if (result) {
+                    System.out.println("Zrzut ekranu zapisany jako: " + file.getAbsolutePath());
+                } else {
+                    System.out.println("Błąd podczas zapisywania zrzutu ekranu.");
+                }
+
+            } catch (Exception ex) {
+                System.out.println("Nieoczekiwany błąd: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void resetLabirynt() {
+        labirynt = new Labirynt();
+        colorPanel.removeAll();
+        colorPanel.setBackground(Color.WHITE);
+        colorPanel.revalidate();
+        colorPanel.repaint();
+    }
+
+    private void nie_wyswietlaj() {
+        colorPanel.removeAll();
+        colorPanel.setBackground(Color.WHITE);
+        colorPanel.revalidate();
+        colorPanel.repaint();
     }
 }
