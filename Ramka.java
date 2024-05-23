@@ -7,8 +7,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+
 public class Ramka extends JFrame implements ActionListener {
+    boolean wczytLab = false;
     JButton b1, b2, b3, b4, b5, b6, b7, b8, b9;
     JLabel t1;
     Labirynt labirynt = new Labirynt();
@@ -48,7 +49,7 @@ public class Ramka extends JFrame implements ActionListener {
         t1.setFont(new Font("SansSerif", Font.BOLD, 14));
         background.add(t1);
 
-        b4 = new JButton("Stworz JPG");
+        b4 = new JButton("Stworz PNG");
         b4.setToolTipText("Tworzy labirynt w postaci graficznej");
         b4.setBackground(Color.GREEN);
         b4.setBounds(150, 20, 125, 40);
@@ -122,18 +123,28 @@ public class Ramka extends JFrame implements ActionListener {
             int response = fileChooser.showOpenDialog(null);
             if (response == JFileChooser.APPROVE_OPTION) {
                 File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                if (this.wczytLab == true) {
+                    resetLabirynt();
+                }
                 System.out.println(file);// pod file kryje sie sciezka do pliku ktora podamy do metody
                 labirynt.file = file;
                 labirynt.liczWielkosc();
                 labirynt.doPamieci();
-                labirynt.wyswietlLabirynt(colorPanel);
+                labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                this.wczytLab = true;
             }
         } else if (zrodlo == b3) {
             dispose();
         } else if (zrodlo == b4) {
             t1.setText("Tworze obrazek...");
+            makeScreenshot(colorPanel);
         } else if (zrodlo == b5) {
             t1.setText("Wyszukuje najkrotsza sciezke...");
+            if (this.wczytLab == true) {
+                labirynt.BFS();
+                nie_wyswietlaj();
+                labirynt.wyswietlLabirynt(colorPanel, labirynt.labiryntDoRysowania);
+            }
         } else if (zrodlo == b6) {
             t1.setText("Ustaw poczatek labiryntu!");
         } else if (zrodlo == b7) {
@@ -141,37 +152,48 @@ public class Ramka extends JFrame implements ActionListener {
         } else if (zrodlo == b8) {
             t1.setText("RESETUJE LABIRYNT...");
             resetLabirynt();
+            this.wczytLab = false;
         } else if (zrodlo == b9) {
             t1.setText("Obecny komunikat:");
         }
     }
-        public static final void makeScreenshot(JPanel colorPanel2) {
+
+    public static final void makeScreenshot(JPanel colorPanel2) {
         Rectangle rec = colorPanel2.getBounds();
         BufferedImage bufferedImage = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_INT_ARGB);
         colorPanel2.paint(bufferedImage.getGraphics());
 
-        try {
-          
-            File file = new File("C:\\MinGW\\bin\\screenshot.png");
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Wybierz lokalizację do zapisu zrzutu ekranu");
+        fileChooser.setSelectedFile(new File("screenshot.png")); // Domyślna nazwa pliku
 
-           
-            System.out.println("Próba zapisu zrzutu ekranu do: " + file.getAbsolutePath());
+        int userSelection = fileChooser.showSaveDialog(null);
 
-            
-            boolean result = ImageIO.write(bufferedImage, "png", file);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try {
 
-            if (result) {
-                System.out.println("Zrzut ekranu zapisany jako: " + file.getAbsolutePath());
-            } else {
-                System.out.println("Błąd podczas zapisywania zrzutu ekranu." + result);           }
-        
-        } catch (Exception ex) {
-            System.out.println("Nieoczekiwany błąd: " + ex.getMessage());
-            ex.printStackTrace();
+                boolean result = ImageIO.write(bufferedImage, "png", file);
+
+                if (result) {
+                } else {
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
+
     private void resetLabirynt() {
-        labirynt = new Labirynt(); 
+        labirynt = new Labirynt();
+        colorPanel.removeAll();
+        colorPanel.setBackground(Color.WHITE);
+        colorPanel.revalidate();
+        colorPanel.repaint();
+    }
+
+    private void nie_wyswietlaj() {
         colorPanel.removeAll();
         colorPanel.setBackground(Color.WHITE);
         colorPanel.revalidate();
