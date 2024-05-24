@@ -15,6 +15,8 @@ public class Labirynt extends JFrame {
     int koniecW;
     int koniecK;
     char labiryntDoRysowania[][];
+    char znakStart = 'X';
+    char znakKoniec = 'X';
 
     public void doPamieci() {
         try {
@@ -229,6 +231,22 @@ public class Labirynt extends JFrame {
                 break;
             }
         }
+    }
+
+    public void ustawStart(int wiersze, int kolumny) {
+        this.zawartosc[this.startW][this.startK] = this.znakStart;
+        this.startW = wiersze;
+        this.startK = kolumny;
+        this.znakStart = this.zawartosc[wiersze][kolumny];
+        this.zawartosc[wiersze][kolumny] = 'P';
+    }
+
+    public void ustawKoniec(int wiersze, int kolumny) {
+        this.zawartosc[this.koniecW][this.koniecK] = this.znakKoniec;
+        this.koniecW = wiersze;
+        this.koniecK = kolumny;
+        this.znakKoniec = this.zawartosc[wiersze][kolumny];
+        this.zawartosc[wiersze][kolumny] = 'K';
     }
 
 }
