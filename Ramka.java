@@ -1,15 +1,14 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Ramka extends JFrame implements ActionListener {
     boolean wczytLab = false;
+    boolean settingStart = false;
+    boolean settingEnd = false;
     JButton b1, b2, b3, b4, b5, b6, b7, b8, b9;
     JLabel t1;
     Labirynt labirynt = new Labirynt();
@@ -112,6 +111,40 @@ public class Ramka extends JFrame implements ActionListener {
             }
         });
 
+        // Add mouse listener for setting start and end points
+        colorPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (settingStart || settingEnd) {
+                    Point point = e.getPoint();
+                    Dimension panelSize = colorPanel.getSize(); // Current size of the panel
+                    Dimension labSize = new Dimension(labirynt.kolumny, labirynt.wiersze); // Size of the labyrinth in
+                                                                                           // terms of cells
+
+                    double scaleX = (double) panelSize.width / labSize.width;
+                    double scaleY = (double) panelSize.height / labSize.height;
+
+                    // Use Math.floor to ensure the correct cell is selected even if the click is
+                    // near the border
+                    int col = (int) Math.floor(point.x / scaleX);
+                    int row = (int) Math.floor(point.y / scaleY);
+
+                    if (row >= 0 && row < labirynt.wiersze && col >= 0 && col < labirynt.kolumny) {
+                        if (settingStart) {
+                            labirynt.ustawStart(row, col);
+                            t1.setText("Nowy początek: (" + row + ", " + col + ")");
+                            settingStart = false;
+                        } else if (settingEnd) {
+                            labirynt.ustawKoniec(row, col);
+                            t1.setText("Nowy koniec: (" + row + ", " + col + ")");
+                            settingEnd = false;
+                        }
+                        labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                    }
+                }
+            }
+        });
+
         setVisible(true);
     }
 
@@ -147,8 +180,16 @@ public class Ramka extends JFrame implements ActionListener {
             }
         } else if (zrodlo == b6) {
             t1.setText("Ustaw poczatek labiryntu!");
+            if (this.wczytLab == true) {
+                settingStart = true;
+                settingEnd = false;
+            }
         } else if (zrodlo == b7) {
             t1.setText("Ustaw koniec labiryntu!");
+            if (this.wczytLab == true) {
+                settingStart = false;
+                settingEnd = true;
+            }
         } else if (zrodlo == b8) {
             t1.setText("RESETUJE LABIRYNT...");
             resetLabirynt();
@@ -164,23 +205,17 @@ public class Ramka extends JFrame implements ActionListener {
         colorPanel2.paint(bufferedImage.getGraphics());
 
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Wybierz lokalizację do zapisu zrzutu ekranu");
-        fileChooser.setSelectedFile(new File("screenshot.png")); // Domyślna nazwa pliku
-
+        fileChooser.setDialogTitle("Wybierz lokalizację do zapisu");
         int userSelection = fileChooser.showSaveDialog(null);
-
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
+            File fileToSave = fileChooser.getSelectedFile();
             try {
-
-                boolean result = ImageIO.write(bufferedImage, "png", file);
-
-                if (result) {
-                } else {
-                }
-
+                ImageIO.write(bufferedImage, "png", fileToSave);
+                JOptionPane.showMessageDialog(null, "Zrzut ekranu zapisany pomyślnie!", "Sukces",
+                        JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Błąd podczas zapisywania pliku!", "Błąd",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -199,4 +234,5 @@ public class Ramka extends JFrame implements ActionListener {
         colorPanel.revalidate();
         colorPanel.repaint();
     }
+
 }
