@@ -1,9 +1,8 @@
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Labirynt extends JFrame {
     int wiersze = 0;
@@ -19,8 +18,7 @@ public class Labirynt extends JFrame {
     char znakKoniec = 'X';
 
     public void doPamieci() {
-        try {
-            FileReader reader = new FileReader(file);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             this.zawartosc = new char[wiersze][kolumny];
             int znak;
             for (int i = 0; i < this.wiersze; i++) {
@@ -40,27 +38,29 @@ public class Labirynt extends JFrame {
                     }
                 }
             }
-            reader.close();
         } catch (IOException e) {
             System.err.println("Błąd podczas czytania pliku: " + e.getMessage());
         }
     }
 
     public void liczWielkosc() {
-        try {
-            int pomKol = 0;
-            FileReader reader = new FileReader(file);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             int znak;
-            while ((znak = reader.read()) != -1) {
-                if (znak == '\n') {
-                    pomKol++;
-                    this.wiersze++;
+            if (file.getName().toLowerCase().endsWith(".bin")) {
+                Dekoder.binToText(file, this);
+            } else {
+                while ((znak = reader.read()) != -1) {
+                    if (znak == '\n') {
+                        wiersze++;
+                    }
+                    if (wiersze == 0) {
+                        kolumny++;
+                    }
                 }
-                if (pomKol == 0) {
-                    this.kolumny++;
+                if (wiersze > 0 && kolumny > 0) {
+                    wiersze++; // Dodajemy ostatni wiersz, jeśli nie kończy się znakiem nowej linii
                 }
             }
-            reader.close();
         } catch (IOException e) {
             System.err.println("Błąd podczas czytania pliku: " + e.getMessage());
         }
@@ -69,168 +69,106 @@ public class Labirynt extends JFrame {
     public void wyswietlLabirynt(JPanel panel, char[][] labirynt) {
         panel.removeAll();
         panel.setLayout(new GridLayout(this.wiersze, this.kolumny));
+        JLabel[][] labels = new JLabel[this.wiersze][this.kolumny];
 
         for (int i = 0; i < this.wiersze; i++) {
             for (int j = 0; j < this.kolumny; j++) {
                 JLabel label = new JLabel();
                 label.setOpaque(true);
-                switch (labirynt[i][j]) {
-                    case 'X':
-                        label.setBackground(Color.BLACK);
-                        break;
-                    case ' ':
-                        label.setBackground(Color.WHITE);
-                        break;
-                    case 'P':
-                        label.setBackground(Color.GREEN);
-                        break;
-                    case 'K':
-                        label.setBackground(Color.RED);
-                        break;
-                    case 'W':
-                        label.setBackground(Color.BLUE);
-                        break;
-                    default:
-                        label.setBackground(Color.WHITE);
-                        break;
-                }
+                label.setBackground(getColor(labirynt[i][j]));
+                labels[i][j] = label;
                 panel.add(label);
             }
         }
+
         panel.setPreferredSize(new Dimension(this.kolumny * 10, this.wiersze * 10));
         panel.revalidate();
         panel.repaint();
     }
 
+    private Color getColor(char c) {
+        switch (c) {
+            case 'X':
+                return Color.BLACK;
+            case 'P':
+                return Color.GREEN;
+            case 'K':
+                return Color.RED;
+            case 'W':
+                return Color.BLUE;
+            default:
+                return Color.WHITE;
+        }
+    }
+
     public void kopiujLabirynt(char[][] zrodlo, char[][] cel) {
         if (zrodlo != null && cel != null) {
-            int wiersze = zrodlo.length;
-            int kolumny = zrodlo[0].length;
-            for (int i = 0; i < wiersze; i++) {
-                System.arraycopy(zrodlo[i], 0, cel[i], 0, kolumny);
+            for (int i = 0; i < zrodlo.length; i++) {
+                System.arraycopy(zrodlo[i], 0, cel[i], 0, zrodlo[i].length);
             }
         }
     }
 
-    public void BFS() { // To tu trzeba poprawić
-        int i = 0;
+    public void BFS() {
         char[][] labirynt = new char[wiersze][kolumny];
         kopiujLabirynt(this.zawartosc, labirynt);
-        ArrayList<Integer> kolumnyKol = new ArrayList<>();
-        ArrayList<Integer> wierszeKol = new ArrayList<>();
-        kolumnyKol.add(startK);
-        wierszeKol.add(startW);
-        while (true) {// obsługa dla startK i startW = 0 do dodania
-            if (wierszeKol.get(i) < this.wiersze - 1) {
-                if ((labirynt[wierszeKol.get(i) + 1][kolumnyKol.get(i)] == 'K') == true) {
-                    break;
-                }
-                if ((labirynt[wierszeKol.get(i) + 1][kolumnyKol.get(i)] == ' ') == true) { // dół
-                    wierszeKol.add(wierszeKol.get(i) + 1);
-                    kolumnyKol.add(kolumnyKol.get(i));
-                    labirynt[wierszeKol.get(i) + 1][kolumnyKol.get(i)] = 'D';
-                }
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[] { startW, startK });
+
+        while (!queue.isEmpty()) {
+            int[] pos = queue.poll();
+            int x = pos[0];
+            int y = pos[1];
+
+            if (x == koniecW && y == koniecK) {
+                break;
             }
 
-            if (kolumnyKol.get(i) < this.kolumny - 1) {
-                if ((labirynt[wierszeKol.get(i)][kolumnyKol.get(i) + 1] == 'K') == true) {
-                    break;
-                }
-                if ((labirynt[wierszeKol.get(i)][kolumnyKol.get(i) + 1] == ' ') == true) { // prawo
-                    wierszeKol.add(wierszeKol.get(i));
-                    kolumnyKol.add(kolumnyKol.get(i) + 1);
-                    labirynt[wierszeKol.get(i)][kolumnyKol.get(i) + 1] = 'L';
-                }
-            }
-
-            if (wierszeKol.get(i) > 0) {
-                if ((labirynt[wierszeKol.get(i) - 1][kolumnyKol.get(i)] == 'K') == true) {
-                    break;
-                }
-                if ((labirynt[wierszeKol.get(i) - 1][kolumnyKol.get(i)] == ' ') == true) { // góra
-                    wierszeKol.add(wierszeKol.get(i) - 1);
-                    kolumnyKol.add(kolumnyKol.get(i));
-                    labirynt[wierszeKol.get(i) - 1][kolumnyKol.get(i)] = 'U';
-                }
-            }
-
-            if (kolumnyKol.get(i) > 0) {
-                if ((labirynt[wierszeKol.get(i)][kolumnyKol.get(i) - 1] == 'K') == true) {
-                    break;
-                }
-                if ((labirynt[wierszeKol.get(i)][kolumnyKol.get(i) - 1] == ' ') == true) { // lewo
-                    wierszeKol.add(wierszeKol.get(i));
-                    kolumnyKol.add(kolumnyKol.get(i) - 1);
-                    labirynt[wierszeKol.get(i)][kolumnyKol.get(i) - 1] = 'R';
-                }
-            }
-            i++;
+            explore(queue, labirynt, x + 1, y, 'U');
+            explore(queue, labirynt, x - 1, y, 'D');
+            explore(queue, labirynt, x, y + 1, 'L');
+            explore(queue, labirynt, x, y - 1, 'R');
         }
+
         sciezka(labirynt);
     }
 
-    public void sciezka(char[][] labirynt) { // idziemy od końca i znajdujemy ścieżke. Dodać lokalizacje końca
-        char znak;
-        int aktW = this.koniecW;
-        int aktK = this.koniecK;
+    private void explore(Queue<int[]> queue, char[][] labirynt, int x, int y, char direction) {
+        if (x >= 0 && x < wiersze && y >= 0 && y < kolumny) {
+            if (labirynt[x][y] == ' ' || labirynt[x][y] == 'K') {
+                queue.add(new int[] { x, y });
+                labirynt[x][y] = direction;
+            }
+        }
+    }
+
+    public void sciezka(char[][] labirynt) {
+        int x = koniecW;
+        int y = koniecK;
         this.labiryntDoRysowania = new char[wiersze][kolumny];
         kopiujLabirynt(this.zawartosc, this.labiryntDoRysowania);
-        // badamy otoczenie wokol K
-        while (true) {
-            // dół
-            if (aktW != this.wiersze - 1) {
-                znak = labirynt[aktW + 1][aktK];
-                if (znak == 'U' || znak == 'D' || znak == 'R' || znak == 'L') {
-                    aktW++;
+
+        while (labirynt[x][y] != 'P') {
+            this.labiryntDoRysowania[x][y] = 'W';
+            switch (labirynt[x][y]) {
+                case 'U':
+                    x--;
                     break;
-                }
-            }
-            // góra
-            if (aktW != 0) {
-                znak = labirynt[aktW - 1][aktK];
-                if (znak == 'U' || znak == 'D' || znak == 'R' || znak == 'L') {
-                    aktW--;
+                case 'D':
+                    x++;
                     break;
-                }
-            }
-            // prawo
-            if (aktK != this.kolumny - 1) {
-                znak = labirynt[aktW][aktK + 1];
-                if (znak == 'U' || znak == 'D' || znak == 'R' || znak == 'L') {
-                    aktK++;
+                case 'L':
+                    y--;
                     break;
-                }
-            }
-            // lewo
-            if (aktK != 0) {
-                znak = labirynt[aktW][aktK - 1];
-                if (znak == 'U' || znak == 'D' || znak == 'R' || znak == 'L') {
-                    aktK--;
+                case 'R':
+                    y++;
                     break;
-                }
             }
         }
-        while (true) {
-            if ((znak == 'U') == true) {
-                this.labiryntDoRysowania[aktW][aktK] = 'W';
-                aktW++;
-                znak = labirynt[aktW][aktK];
-            } else if ((znak == 'D') == true) {
-                this.labiryntDoRysowania[aktW][aktK] = 'W';
-                aktW--;
-                znak = labirynt[aktW][aktK];
-            } else if ((znak == 'R') == true) {
-                this.labiryntDoRysowania[aktW][aktK] = 'W';
-                aktK++;
-                znak = labirynt[aktW][aktK];
-            } else if ((znak == 'L') == true) {
-                this.labiryntDoRysowania[aktW][aktK] = 'W';
-                aktK--;
-                znak = labirynt[aktW][aktK];
-            } else if ((znak == 'P') == true) {
-                break;
-            }
-        }
+
+        // Ensure the starting and ending points are properly marked
+        this.labiryntDoRysowania[startW][startK] = 'P';
+        this.labiryntDoRysowania[koniecW][koniecK] = 'K';
     }
 
     public void ustawStart(int wiersze, int kolumny) {
@@ -248,5 +186,4 @@ public class Labirynt extends JFrame {
         this.znakKoniec = this.zawartosc[wiersze][kolumny];
         this.zawartosc[wiersze][kolumny] = 'K';
     }
-
 }
