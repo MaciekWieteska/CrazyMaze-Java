@@ -17,6 +17,28 @@ public class Labirynt extends JFrame {
     char znakStart = 'X';
     char znakKoniec = 'X';
 
+    public void setWiersze(int wiersze) {
+        this.wiersze = wiersze;
+    }
+
+    public void setKolumny(int kolumny) {
+        this.kolumny = kolumny;
+    }
+
+    public void setZawartosc(char[][] zawartosc) {
+        this.zawartosc = zawartosc;
+    }
+
+    public void setStart(int wiersze, int kolumny) {
+        this.startW = wiersze;
+        this.startK = kolumny;
+    }
+
+    public void setKoniec(int wiersze, int kolumny) {
+        this.koniecW = wiersze;
+        this.koniecK = kolumny;
+    }
+
     public void doPamieci() {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             this.zawartosc = new char[wiersze][kolumny];
@@ -46,20 +68,16 @@ public class Labirynt extends JFrame {
     public void liczWielkosc() {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             int znak;
-            if (file.getName().toLowerCase().endsWith(".bin")) {
-                Dekoder.binToText(file, this);
-            } else {
-                while ((znak = reader.read()) != -1) {
-                    if (znak == '\n') {
-                        wiersze++;
-                    }
-                    if (wiersze == 0) {
-                        kolumny++;
-                    }
+            while ((znak = reader.read()) != -1) {
+                if (znak == '\n') {
+                    wiersze++;
                 }
-                if (wiersze > 0 && kolumny > 0) {
-                    wiersze++; // Dodajemy ostatni wiersz, jeśli nie kończy się znakiem nowej linii
+                if (wiersze == 0) {
+                    kolumny++;
                 }
+            }
+            if (wiersze > 0 && kolumny > 0) {
+                wiersze++; // Dodajemy ostatni wiersz, jeśli nie kończy się znakiem nowej linii
             }
         } catch (IOException e) {
             System.err.println("Błąd podczas czytania pliku: " + e.getMessage());

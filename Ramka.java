@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 public class Ramka extends JFrame implements ActionListener {
     boolean wczytLab = false;
@@ -14,6 +15,7 @@ public class Ramka extends JFrame implements ActionListener {
     Labirynt labirynt = new Labirynt();
     JPanel colorPanel;
     JScrollPane scrollPane;
+    DekoderBin dekoder = new DekoderBin();
 
     public Ramka() {
         setSize(800, 800);
@@ -159,11 +161,20 @@ public class Ramka extends JFrame implements ActionListener {
                 if (this.wczytLab == true) {
                     resetLabirynt();
                 }
-                System.out.println(file);// pod file kryje sie sciezka do pliku ktora podamy do metody
-                labirynt.file = file;
-                labirynt.liczWielkosc();
-                labirynt.doPamieci();
-                labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                if (file.getName().toLowerCase().endsWith(".bin")) {
+                    // Dekodowanie pliku binarnego
+                    try {
+                        dekoder.binToText(file.getAbsolutePath(), labirynt);
+                        labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                    } catch (IOException ex) {
+                        t1.setText("Błąd przy dekodowaniu pliku: " + ex.getMessage());
+                    }
+                } else {
+                    labirynt.file = file;
+                    labirynt.liczWielkosc();
+                    labirynt.doPamieci();
+                    labirynt.wyswietlLabirynt(colorPanel, labirynt.zawartosc);
+                }
                 this.wczytLab = true;
             }
         } else if (zrodlo == b3) {
