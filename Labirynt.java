@@ -183,8 +183,6 @@ public class Labirynt extends JFrame {
                     break;
             }
         }
-
-        // Ensure the starting and ending points are properly marked
         this.labiryntDoRysowania[startW][startK] = 'P';
         this.labiryntDoRysowania[koniecW][koniecK] = 'K';
     }
